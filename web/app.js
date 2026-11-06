@@ -706,6 +706,17 @@ unitToggleBtn.addEventListener('click', () => {
     updateUnits();
 });
 
+// Register Service Worker for true offline PWA functionality
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then((reg) => {
+            console.log('WeatherApp PWA ServiceWorker active:', reg.scope);
+        }).catch((err) => {
+            console.warn('WeatherApp ServiceWorker note:', err);
+        });
+    });
+}
+
 // Startup launch
 window.addEventListener('DOMContentLoaded', () => {
     handleSearch('Tokyo');
