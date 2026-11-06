@@ -1,0 +1,21 @@
+{
+  "name": "Weather App - Live Global Forecast",
+  "short_name": "WeatherApp",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1e3c72",
+  "theme_color": "#1e3c72",
+  "description": "Commercial-grade live real-time weather and forecast application.",
+  "icons": [
+    {
+      "src": "assets/cloudy.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/cloudy.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

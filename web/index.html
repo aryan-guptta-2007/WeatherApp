@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather App - Global Live Forecast</title>
+    <title>Weather App - Commercial Live Forecast</title>
     <link rel="icon" type="image/png" href="assets/cloudy.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e3c72">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Background Interactive Canvas for Live Particles (Rain, Snow, Sun Rays, Mist) -->
+    <canvas id="weather-canvas"></canvas>
+
     <div class="app-container">
-        <!-- Top Search Bar -->
+        <!-- Top Search Bar & Action Controls -->
         <header class="search-header">
             <div class="search-box">
                 <input 
@@ -22,35 +27,51 @@
                 <button id="search-btn" title="Search weather">
                     <img src="assets/search.png" alt="Search">
                 </button>
+                <!-- Live Search Autocomplete Dropdown -->
+                <ul id="autocomplete-list" class="autocomplete-dropdown hidden"></ul>
             </div>
-            <button id="locate-btn" class="icon-btn" title="Use current location">
+
+            <button id="locate-btn" class="icon-btn" title="Detect my current location (GPS + Reverse Geocoding)">
                 📍
             </button>
-            <button id="unit-toggle-btn" class="toggle-btn" title="Toggle temperature unit">
+            <button id="favorite-btn" class="icon-btn" title="Save / Pin this city to favorites">
+                ☆
+            </button>
+            <button id="particles-toggle-btn" class="icon-btn" title="Toggle interactive weather particles">
+                ✨
+            </button>
+            <button id="unit-toggle-btn" class="toggle-btn" title="Toggle temperature unit (°C / °F)">
                 °F
             </button>
         </header>
 
-        <!-- Quick Popular City Chips -->
-        <nav class="city-chips" aria-label="Quick city selection">
-            <button class="chip" data-city="Tokyo">Tokyo</button>
-            <button class="chip" data-city="London">London</button>
-            <button class="chip" data-city="New York">New York</button>
-            <button class="chip" data-city="Paris">Paris</button>
-            <button class="chip" data-city="Sydney">Sydney</button>
+        <!-- Pinned Favorites & Popular City Chips Bar -->
+        <nav class="city-chips-bar" aria-label="City quick access">
+            <div id="favorites-container" class="favorites-wrapper">
+                <!-- Dynamically populated from localStorage -->
+            </div>
+            <div class="default-chips">
+                <button class="chip" data-city="Tokyo">Tokyo</button>
+                <button class="chip" data-city="London">London</button>
+                <button class="chip" data-city="New York">New York</button>
+                <button class="chip" data-city="Paris">Paris</button>
+                <button class="chip" data-city="Sydney">Sydney</button>
+            </div>
         </nav>
-
-        <!-- Notification / Error Message -->
-        <div id="alert-msg" class="alert hidden"></div>
 
         <!-- Main Weather Card -->
         <main class="weather-card">
-            <!-- Loading Indicator -->
+            <!-- Loading Spinner -->
             <div id="loading-spinner" class="spinner hidden"></div>
 
             <div class="location-header">
-                <h1 id="city-name">Tokyo, Japan</h1>
-                <p id="local-time" class="sub-text">Local Time: --:--</p>
+                <div>
+                    <h1 id="city-name">Tokyo, Japan</h1>
+                    <p id="local-time" class="sub-text">Local Time: --:--</p>
+                </div>
+                <button id="copy-report-btn" class="copy-btn" title="Copy weather report to clipboard">
+                    📋 Share
+                </button>
             </div>
 
             <div class="weather-visual">
@@ -59,33 +80,77 @@
 
             <div class="temperature-section">
                 <div class="temperature-wrapper">
-                    <span id="temperature-val">16.7</span>
+                    <span id="temperature-val">16.0</span>
                     <span id="temp-unit" class="unit">°C</span>
                 </div>
                 <div id="weather-desc" class="weather-desc">Cloudy</div>
-                <div id="feels-like" class="feels-like">Feels like: 15.1 °C</div>
+                <div id="feels-like" class="feels-like">Feels like: 14.5 °C</div>
             </div>
 
-            <!-- Highlights / Metrics Grid -->
+            <!-- Comprehensive 6-Metric Highlights Grid -->
             <section class="metrics-grid">
+                <!-- 1. Humidity -->
                 <div class="metric-card">
                     <img src="assets/humidity.png" alt="Humidity" class="metric-icon">
                     <div class="metric-info">
                         <span class="metric-title">Humidity</span>
-                        <span id="humidity-val" class="metric-value">60%</span>
+                        <span id="humidity-val" class="metric-value">59%</span>
+                        <span id="humidity-desc" class="metric-sub">Comfortable</span>
                     </div>
                 </div>
 
+                <!-- 2. Wind Speed & Direction -->
                 <div class="metric-card">
                     <img src="assets/windspeed.png" alt="Wind speed" class="metric-icon">
                     <div class="metric-info">
-                        <span class="metric-title">Wind Speed</span>
-                        <span id="windspeed-val" class="metric-value">7.4 km/h</span>
+                        <span class="metric-title">Wind</span>
+                        <span id="windspeed-val" class="metric-value">6.3 km/h</span>
+                        <span id="wind-dir" class="metric-sub">Gentle breeze</span>
+                    </div>
+                </div>
+
+                <!-- 3. Surface Pressure -->
+                <div class="metric-card">
+                    <span class="metric-emoji">📉</span>
+                    <div class="metric-info">
+                        <span class="metric-title">Pressure</span>
+                        <span id="pressure-val" class="metric-value">1009 hPa</span>
+                        <span id="pressure-desc" class="metric-sub">Normal</span>
+                    </div>
+                </div>
+
+                <!-- 4. UV Index -->
+                <div class="metric-card">
+                    <span class="metric-emoji">☀️</span>
+                    <div class="metric-info">
+                        <span class="metric-title">UV Index</span>
+                        <span id="uv-val" class="metric-value">4.5</span>
+                        <span id="uv-badge" class="metric-badge">Moderate</span>
+                    </div>
+                </div>
+
+                <!-- 5. Rain Chance -->
+                <div class="metric-card">
+                    <span class="metric-emoji">🌧️</span>
+                    <div class="metric-info">
+                        <span class="metric-title">Rain Chance</span>
+                        <span id="rain-chance-val" class="metric-value">18%</span>
+                        <span id="precip-val" class="metric-sub">0.0 mm</span>
+                    </div>
+                </div>
+
+                <!-- 6. Sun Cycle -->
+                <div class="metric-card">
+                    <span class="metric-emoji">🌅</span>
+                    <div class="metric-info">
+                        <span class="metric-title">Sun Cycle</span>
+                        <span id="sunrise-val" class="metric-value">↑ 06:08</span>
+                        <span id="sunset-val" class="metric-sub">↓ 16:40</span>
                     </div>
                 </div>
             </section>
 
-            <!-- Hourly Forecast (24 Hours) -->
+            <!-- Hourly Forecast (Next 24 Hours) -->
             <section class="hourly-section">
                 <h2 class="section-title">Hourly Forecast (Next 24h)</h2>
                 <div id="hourly-container" class="hourly-container">
@@ -93,15 +158,18 @@
                 </div>
             </section>
 
-            <!-- 5-Day Forecast -->
+            <!-- 5-Day Forecast Section -->
             <section class="forecast-section">
-                <h2 class="section-title">5-Day Forecast</h2>
+                <h2 class="section-title">5-Day Extended Forecast</h2>
                 <div id="forecast-container" class="forecast-container">
                     <!-- Populated dynamically -->
                 </div>
             </section>
         </main>
     </div>
+
+    <!-- Floating Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
 
     <script src="app.js"></script>
 </body>
