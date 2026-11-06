@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App - Global Live Forecast</title>
+    <link rel="icon" type="image/png" href="assets/cloudy.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Search Bar -->
+        <header class="search-header">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    placeholder="Search city (e.g. Tokyo, London, New York)..." 
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+                <button id="search-btn" title="Search weather">
+                    <img src="assets/search.png" alt="Search">
+                </button>
+            </div>
+            <button id="locate-btn" class="icon-btn" title="Use current location">
+                📍
+            </button>
+            <button id="unit-toggle-btn" class="toggle-btn" title="Toggle temperature unit">
+                °F
+            </button>
+        </header>
+
+        <!-- Quick Popular City Chips -->
+        <nav class="city-chips" aria-label="Quick city selection">
+            <button class="chip" data-city="Tokyo">Tokyo</button>
+            <button class="chip" data-city="London">London</button>
+            <button class="chip" data-city="New York">New York</button>
+            <button class="chip" data-city="Paris">Paris</button>
+            <button class="chip" data-city="Sydney">Sydney</button>
+        </nav>
+
+        <!-- Notification / Error Message -->
+        <div id="alert-msg" class="alert hidden"></div>
+
+        <!-- Main Weather Card -->
+        <main class="weather-card">
+            <!-- Loading Indicator -->
+            <div id="loading-spinner" class="spinner hidden"></div>
+
+            <div class="location-header">
+                <h1 id="city-name">Tokyo, Japan</h1>
+                <p id="local-time" class="sub-text">Local Time: --:--</p>
+            </div>
+
+            <div class="weather-visual">
+                <img id="weather-icon" src="assets/cloudy.png" alt="Weather condition" class="weather-icon">
+            </div>
+
+            <div class="temperature-section">
+                <div class="temperature-wrapper">
+                    <span id="temperature-val">16.7</span>
+                    <span id="temp-unit" class="unit">°C</span>
+                </div>
+                <div id="weather-desc" class="weather-desc">Cloudy</div>
+                <div id="feels-like" class="feels-like">Feels like: 15.1 °C</div>
+            </div>
+
+            <!-- Highlights / Metrics Grid -->
+            <section class="metrics-grid">
+                <div class="metric-card">
+                    <img src="assets/humidity.png" alt="Humidity" class="metric-icon">
+                    <div class="metric-info">
+                        <span class="metric-title">Humidity</span>
+                        <span id="humidity-val" class="metric-value">60%</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <img src="assets/windspeed.png" alt="Wind speed" class="metric-icon">
+                    <div class="metric-info">
+                        <span class="metric-title">Wind Speed</span>
+                        <span id="windspeed-val" class="metric-value">7.4 km/h</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Hourly Forecast (24 Hours) -->
+            <section class="hourly-section">
+                <h2 class="section-title">Hourly Forecast (Next 24h)</h2>
+                <div id="hourly-container" class="hourly-container">
+                    <!-- Populated dynamically -->
+                </div>
+            </section>
+
+            <!-- 5-Day Forecast -->
+            <section class="forecast-section">
+                <h2 class="section-title">5-Day Forecast</h2>
+                <div id="forecast-container" class="forecast-container">
+                    <!-- Populated dynamically -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
